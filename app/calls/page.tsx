@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import Sidebar from '@/components/Sidebar'
 import Link from 'next/link'
-import { Search, X, Phone, Download, Play, RefreshCw } from 'lucide-react'
+import { Search, X, Play, RefreshCw, Download } from 'lucide-react'
 
 type Call = {
   id: string
@@ -29,7 +29,7 @@ export default function CallsPage() {
   const [debugError, setDebugError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
 
-  // Demo data for when no Vapi key or for testing
+  // Demo data (used when no Vapi key is connected)
   const demoCalls: Call[] = [
     {
       id: 'demo-1',
@@ -196,7 +196,6 @@ export default function CallsPage() {
           </div>
         </div>
 
-        {/* No Vapi notice */}
         {!vapiKey && !loading && (
           <div className="mb-8 border border-blue-200 bg-blue-50 rounded-3xl p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="flex-1">
@@ -215,7 +214,7 @@ export default function CallsPage() {
           </div>
         )}
 
-        {/* Filters & Search */}
+        {/* Search + Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-3.5 text-gray-400" size={18} />
@@ -339,7 +338,6 @@ export default function CallsPage() {
                 </button>
               </div>
 
-              {/* Summary */}
               <div className="mb-8">
                 <div className="text-xs font-semibold tracking-wider text-electric mb-2">AI SUMMARY</div>
                 <div className="bg-electriclight rounded-2xl p-5 text-sm leading-relaxed">
@@ -347,7 +345,6 @@ export default function CallsPage() {
                 </div>
               </div>
 
-              {/* Status badge */}
               <div className="mb-8">
                 <div className="text-xs font-semibold tracking-wider text-gray-500 mb-2">OUTCOME</div>
                 <div className={`inline-block px-4 py-1.5 rounded-2xl text-sm font-semibold ${getStatus(selected).color}`}>
@@ -355,7 +352,6 @@ export default function CallsPage() {
                 </div>
               </div>
 
-              {/* Transcript */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-xs font-semibold tracking-wider text-gray-500">FULL TRANSCRIPT</div>
