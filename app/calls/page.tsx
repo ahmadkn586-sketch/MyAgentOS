@@ -14,7 +14,9 @@ export default function CallsPage() {
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<any>(null)
   const [filter, setFilter] = useState('all')
-  const [search, setSearch] = useState('')
+const [selected, setSelected] = useState<any>(null)
+const [debugError, setDebugError] = useState('')
+
 
   useEffect(() => {
     const load = async () => {
@@ -139,7 +141,14 @@ export default function CallsPage() {
                         <td className="px-4 py-3">{formatDuration(call.startedAt, call.endedAt)}</td>
                         <td className="px-4 py-3"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${status.color}`}>{status.label}</span></td>
                         <td className="px-4 py-3 text-gray-500 truncate max-w-xs">{call.analysis?.summary || '—'}</td>
-                        <td className="px-4 py-3"><button onClick={() => setSelected(call)} className="border border-bordergray px-3 py-1.5 rounded-lg text-xs font-semibold">View</button></td>
+                        <td className="px-4 py-3"><button onClick={() => {
+  try {
+    setSelected(call)
+  } catch (e: any) {
+    setDebugError(e.message + '\n\n' + JSON.stringify(call, null, 2).slice(0, 2000))
+  }
+}} className="border border-bordergray px-3 py-1.5 rounded-lg text-xs font-semibold">View</button>
+</td>
                       </tr>
                     )
                   })}
@@ -182,6 +191,12 @@ export default function CallsPage() {
           </div>
         </div>
       )}
+      {debugError && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] p-6" onClick={() => setDebugError('')}>
+    <pre className="bg-white p-6 rounded-lg max-w-2xl max-h-[80vh] overflow-auto text-xs whitespace-pre-wrap">{debugError}</pre>
+  </div>
+)}
+
     </div>
   )
 }
