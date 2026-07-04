@@ -1,147 +1,101 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase-client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const supabase = createClient()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [businessName, setBusinessName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const router = useRouter()
+  const supabase = createClient()
 
-  const [form, setForm] = useState({
-    fullName: '',
-    businessName: '',
-    email: '',
-    password: '',
-    businessType: 'Medical Practice',
-    plan: 'growth',
-  })
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
       options: {
-        data: { full_name: form.fullName },
-      },
+        data: { business_name: businessName }
+      }
     })
 
-    if (signUpError) {
-      setError(signUpError.message)
-      setLoading(false)
-      return
+    if (error) {
+      setError(error.message)
+    } else {
+      router.push('/dashboard')
     }
-
-    if (data.user) {
-      // Update the profile with business details (profile row was auto-created by trigger)
-      await supabase
-        .from('profiles')
-        .update({
-          business_name: form.businessName,
-          business_type: form.businessType,
-          plan: form.plan,
-        })
-        .eq('id', data.user.id)
-
-      router.push('/setup-fee')
-    }
-
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-sidebargray flex items-center justify-center px-6 py-12">
-      <div className="bg-white rounded-2xl shadow-sm border border-bordergray p-10 max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="w-10 h-10 bg-electric rounded-lg mx-auto mb-4"></div>
-          <h1 className="text-2xl font-extrabold mb-1">Create your account</h1>
-          <p className="text-gray-500 text-sm">Your AI employee will be ready within 24 hours.</p>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-10">
+          <div className="flex justify-center mb-4">
+            <div className="w-11 h-11 bg-electric rounded-2xl flex items-center justify-center">
+              <span className="text-white font-bold text-3xl">A</span>
+            </div>
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight">Create your account</h1>
+          <p className="text-gray-500 mt-1">Get your AI employee running in minutes</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Full Name"
-            required
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={form.fullName}
-            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Business Name"
-            required
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={form.businessName}
-            onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            required
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            minLength={6}
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-          <select
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={form.businessType}
-            onChange={(e) => setForm({ ...form, businessType: e.target.value })}
-          >
-            <option>Medical Practice</option>
-            <option>Dental Practice</option>
-            <option>Architecture Firm</option>
-            <option>Engineering Firm</option>
-            <option>Law Office</option>
-            <option>Consulting Firm</option>
-            <option>Other</option>
-          </select>
-
-          <div className="grid grid-cols-3 gap-2">
-            {['starter', 'growth', 'scale'].map((p) => (
-              <button
-                type="button"
-                key={p}
-                onClick={() => setForm({ ...form, plan: p })}
-                className={`border rounded-lg py-2.5 text-sm font-semibold capitalize transition ${
-                  form.plan === p ? 'border-electric bg-electriclight text-electric' : 'border-bordergray text-gray-600'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+        <form onSubmit={handleRegister} className="space-y-5">
+          <div>
+            <label className="text-sm font-medium block mb-1.5">Business Name</label>
+            <input 
+              value={businessName} 
+              onChange={(e) => setBusinessName(e.target.value)} 
+              className="w-full border border-bordergray rounded-2xl px-4 py-3" 
+              placeholder="City Medical Practice" 
+              required 
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium block mb-1.5">Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="w-full border border-bordergray rounded-2xl px-4 py-3" 
+              required 
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium block mb-1.5">Password</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              className="w-full border border-bordergray rounded-2xl px-4 py-3" 
+              minLength={6}
+              required 
+            />
           </div>
 
-          {error && <p className="text-danger text-sm">{error}</p>}
+          {error && <div className="text-red-600 text-sm">{error}</div>}
 
-          <button
-            type="submit"
+          <button 
+            type="submit" 
             disabled={loading}
-            className="w-full bg-electric text-white py-3.5 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
+            className="w-full btn btn-primary py-3.5 text-base"
           >
-            {loading ? 'Creating account...' : 'Get Started'}
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account? <Link href="/login" className="text-electric font-semibold">Login</Link>
-        </p>
+        <div className="mt-8 text-center text-sm text-gray-500">
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-electric">Sign in</Link>
+        </div>
       </div>
     </div>
   )
