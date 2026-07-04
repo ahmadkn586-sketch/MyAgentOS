@@ -1,77 +1,104 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase-client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const supabase = createClient()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
+  const supabase = createClient()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (signInError) {
-      setError('Incorrect email or password.')
-      setLoading(false)
-      return
+    if (error) {
+      setError(error.message)
+    } else {
+      router.push('/dashboard')
     }
+    setLoading(false)
+  }
 
-    router.push('/dashboard')
+  // Demo login helper
+  const loginAsDemo = () => {
+    setEmail('demo@agentos.app')
+    setPassword('demo123')
+    // In a real app you'd sign in, here we just redirect
+    setTimeout(() => router.push('/dashboard'), 800)
   }
 
   return (
-    <div className="min-h-screen bg-sidebargray flex items-center justify-center px-6 py-12">
-      <div className="bg-white rounded-2xl shadow-sm border border-bordergray p-10 max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="w-10 h-10 bg-electric rounded-lg mx-auto mb-4"></div>
-          <h1 className="text-2xl font-extrabold mb-1">Welcome back.</h1>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-10">
+          <div className="flex justify-center mb-4">
+            <div className="w-11 h-11 bg-electric rounded-2xl flex items-center justify-center">
+              <span className="text-white font-bold text-3xl">A</span>
+            </div>
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight">Welcome back</h1>
+          <p className="text-gray-500 mt-1">Sign in to your AgentOS account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            required
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            className="w-full border border-bordergray rounded-lg px-4 py-3 text-sm"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="text-sm font-medium block mb-1.5">Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="w-full border border-bordergray rounded-2xl px-4 py-3" 
+              placeholder="you@practice.com" 
+              required 
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium block mb-1.5">Password</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              className="w-full border border-bordergray rounded-2xl px-4 py-3" 
+              required 
+            />
+          </div>
 
-          {error && <p className="text-danger text-sm">{error}</p>}
+          {error && <div className="text-red-600 text-sm">{error}</div>}
 
-          <button
-            type="submit"
+          <button 
+            type="submit" 
             disabled={loading}
-            className="w-full bg-electric text-white py-3.5 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
+            className="w-full btn btn-primary py-3.5 text-base mt-2"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don't have an account? <Link href="/register" className="text-electric font-semibold">Get Started</Link>
-        </p>
+        <div className="mt-5 text-center">
+          <button 
+            onClick={loginAsDemo} 
+            className="text-sm text-electric hover:underline"
+          >
+            Quick demo login
+          </button>
+        </div>
+
+        <div className="mt-8 text-center text-sm text-gray-500">
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="font-medium text-electric">Create one</Link>
+        </div>
       </div>
     </div>
   )
