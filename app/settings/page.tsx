@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import Sidebar from '@/components/Sidebar'
-import { Copy, Check, Save } from 'lucide-react'
+import { Copy, Check } from 'lucide-react'
 
 export default function SettingsPage() {
   const supabase = createClient()
@@ -50,7 +50,7 @@ export default function SettingsPage() {
 
   const saveKeys = async () => {
     if (!userId) {
-      showToast('Demo mode: Changes saved locally (would persist in production)')
+      showToast('Demo mode: Changes saved locally')
       return
     }
     await supabase.from('profiles').update({ 
