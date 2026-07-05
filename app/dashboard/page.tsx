@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-client'
-import { Check, ArrowRight, Phone, Calendar, TrendingUp, Users } from 'lucide-react'
+import { Check, ArrowRight, Phone } from 'lucide-react'
 
 export default function DashboardPage() {
   const supabase = createClient()
@@ -58,7 +58,6 @@ export default function DashboardPage() {
         testCall: hasVapi && hasNumber,
       })
 
-      // Try to fetch calls
       if (hasVapi) {
         try {
           const res = await fetch('https://api.vapi.ai/call', {
@@ -194,7 +193,7 @@ export default function DashboardPage() {
             <Link href="/ai-brain" className="flex items-center justify-between p-4 border border-bordergray hover:border-gray-300 rounded-2xl group">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-electriclight rounded-2xl flex items-center justify-center">
-                  <Users className="text-electric" size={20} />
+                  <span className="text-electric">🧠</span>
                 </div>
                 <div>
                   <div className="font-medium">Update AI Brain</div>
@@ -233,7 +232,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom banner */}
       <div className="mt-8 bg-gradient-to-r from-electriclight to-white border border-bordergray rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <div className="font-semibold text-lg">Your AI employee is handling calls 24/7</div>
