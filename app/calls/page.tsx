@@ -29,7 +29,6 @@ export default function CallsPage() {
   const [debugError, setDebugError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
 
-  // Demo data (used when no Vapi key is connected)
   const demoCalls: Call[] = [
     {
       id: 'demo-1',
@@ -214,7 +213,6 @@ export default function CallsPage() {
           </div>
         )}
 
-        {/* Search + Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-3.5 text-gray-400" size={18} />
@@ -247,7 +245,6 @@ export default function CallsPage() {
           </div>
         </div>
 
-        {/* Calls Table */}
         <div className="card overflow-hidden">
           <table className="w-full">
             <thead>
@@ -318,7 +315,6 @@ export default function CallsPage() {
         </div>
       </main>
 
-      {/* Call Detail Panel */}
       {selected && (
         <div className="fixed inset-0 bg-black/40 flex z-50" onClick={() => setSelected(null)}>
           <div 
@@ -396,7 +392,6 @@ export default function CallsPage() {
         </div>
       )}
 
-      {/* Debug modal */}
       {debugError && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-6" onClick={() => setDebugError('')}>
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
