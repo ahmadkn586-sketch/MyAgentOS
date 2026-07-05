@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import {
   LayoutGrid, Brain, Phone, Calendar, MessageSquare, Workflow,
-  Plug, BarChart3, BookOpen, Users, CreditCard, Settings, LogOut,
-  ChevronRight
+  Plug, BarChart3, BookOpen, Users, CreditCard, Settings, LogOut
 } from 'lucide-react'
 
 const nav = [
@@ -92,7 +91,6 @@ export default function Sidebar() {
   return (
     <>
       <aside className="w-72 border-r border-bordergray bg-white h-screen flex flex-col fixed left-0 top-0 z-40">
-        {/* Logo */}
         <div className="p-6 border-b border-bordergray">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-electric rounded-xl flex items-center justify-center">
@@ -105,7 +103,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* User Info */}
         {profile && (
           <div className="px-6 py-4 border-b border-bordergray bg-sidebargray">
             <div className="font-semibold text-sm">{profile.business_name || 'Your Practice'}</div>
@@ -116,7 +113,6 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Navigation */}
         <div className="flex-1 overflow-y-auto p-3 text-sm">
           {nav.map((section) => (
             <div key={section.section} className="mb-1">
@@ -157,7 +153,6 @@ export default function Sidebar() {
           ))}
         </div>
 
-        {/* Bottom */}
         <div className="p-3 border-t border-bordergray">
           <button
             onClick={handleSignOut}
@@ -169,7 +164,6 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-[100] toast">
           <div className="bg-white border border-bordergray shadow-lg rounded-2xl px-5 py-3 flex items-center gap-3 text-sm">
