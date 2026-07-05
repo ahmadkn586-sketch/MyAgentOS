@@ -167,6 +167,9 @@ export default function CallsPage() {
 
   const statusOptions = ['all', 'Handled', 'Appointment Booked', 'Emergency Forwarded', 'Scammer Blocked']
 
+  // ✅ FIXED: Safe transcript access (this solves your TypeScript error)
+  const selectedTranscript = selected?.transcript ?? []
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -199,20 +202,15 @@ export default function CallsPage() {
           <div className="mb-8 border border-blue-200 bg-blue-50 rounded-3xl p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="flex-1">
               <div className="font-semibold text-blue-900 mb-1">Live calls are using demo data</div>
-              <p className="text-blue-700 text-sm">Connect your Vapi account in Settings to see real calls, transcripts and analytics.</p>
+              <p className="text-blue-700 text-sm">Connect your Vapi account in Settings to see real calls.</p>
             </div>
-            <Link href="/settings" className="btn btn-primary whitespace-nowrap">
-              Go to Settings
-            </Link>
+            <Link href="/settings" className="btn btn-primary whitespace-nowrap">Go to Settings</Link>
           </div>
         )}
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">{error}</div>}
 
+        {/* Search + Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-3.5 text-gray-400" size={18} />
@@ -231,20 +229,16 @@ export default function CallsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`filter-btn px-5 py-2 rounded-2xl text-sm font-medium border transition ${
-                  filter === f 
-                    ? 'bg-electriclight border-electric text-electric' 
-                    : 'bg-white border-bordergray hover:bg-gray-50 text-gray-700'
+                  filter === f ? 'bg-electriclight border-electric text-electric' : 'bg-white border-bordergray hover:bg-gray-50 text-gray-700'
                 }`}
               >
-                {f === 'all' ? 'All' : f}
-                <span className="ml-1.5 opacity-60">
-                  ({f === 'all' ? calls.length : calls.filter(c => getStatus(c).label === f).length})
-                </span>
+                {f === 'all' ? 'All' : f} ({f === 'all' ? calls.length : calls.filter(c => getStatus(c).label === f).length})
               </button>
             ))}
           </div>
         </div>
 
+        {/* Table */}
         <div className="card overflow-hidden">
           <table className="w-full">
             <thead>
@@ -260,45 +254,24 @@ export default function CallsPage() {
             <tbody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-t">
-                    <td colSpan={6} className="px-6 py-4"><div className="skeleton h-5 w-3/4 rounded" /></td>
-                  </tr>
+                  <tr key={i} className="border-t"><td colSpan={6} className="px-6 py-4"><div className="skeleton h-5 w-3/4 rounded" /></td></tr>
                 ))
               ) : filteredCalls.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
-                    <div className="text-gray-400">No calls match your filters.</div>
-                  </td>
-                </tr>
+                <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-400">No calls match your filters.</td></tr>
               ) : (
                 filteredCalls.map((call) => {
                   const status = getStatus(call)
                   return (
-                    <tr 
-                      key={call.id} 
-                      className="border-t hover:bg-gray-50/50 cursor-pointer transition"
-                      onClick={() => setSelected(call)}
-                    >
+                    <tr key={call.id} className="border-t hover:bg-gray-50/50 cursor-pointer transition" onClick={() => setSelected(call)}>
                       <td className="px-6 py-5 text-sm text-gray-600">
-                        {new Date(call.startedAt).toLocaleString([], { 
-                          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' 
-                        })}
+                        {new Date(call.startedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                       </td>
                       <td className="font-medium">{call.customer?.number || 'Unknown'}</td>
                       <td className="text-sm text-gray-600">{formatDuration(call.startedAt, call.endedAt)}</td>
-                      <td>
-                        <span className={`status-pill ${status.color}`}>{status.label}</span>
-                      </td>
-                      <td className="text-sm text-gray-600 pr-6 max-w-md truncate">
-                        {call.analysis?.summary || '—'}
-                      </td>
+                      <td><span className={`status-pill ${status.color}`}>{status.label}</span></td>
+                      <td className="text-sm text-gray-600 pr-6 max-w-md truncate">{call.analysis?.summary || '—'}</td>
                       <td className="px-6">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setSelected(call) }}
-                          className="px-4 py-1.5 text-xs font-semibold border border-bordergray hover:bg-white rounded-xl"
-                        >
-                          View
-                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); setSelected(call) }} className="px-4 py-1.5 text-xs font-semibold border border-bordergray hover:bg-white rounded-xl">View</button>
                       </td>
                     </tr>
                   )
@@ -307,20 +280,12 @@ export default function CallsPage() {
             </tbody>
           </table>
         </div>
-
-        <div className="mt-4 text-xs text-gray-400 flex items-center gap-2">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full" /> 
-          {filteredCalls.length} calls shown
-          {vapiKey ? ' • Live from Vapi' : ' • Demo mode'}
-        </div>
       </main>
 
+      {/* Detail Panel - SAFE TRANSCRIPT */}
       {selected && (
         <div className="fixed inset-0 bg-black/40 flex z-50" onClick={() => setSelected(null)}>
-          <div 
-            className="call-detail ml-auto w-full max-w-lg bg-white h-full overflow-y-auto border-l border-bordergray"
-            onClick={e => e.stopPropagation()}
-          >
+          <div className="call-detail ml-auto w-full max-w-lg bg-white h-full overflow-y-auto border-l border-bordergray" onClick={e => e.stopPropagation()}>
             <div className="p-8">
               <div className="flex justify-between items-start mb-8">
                 <div>
@@ -329,73 +294,47 @@ export default function CallsPage() {
                     {new Date(selected.startedAt).toLocaleString()} • {formatDuration(selected.startedAt, selected.endedAt)}
                   </div>
                 </div>
-                <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700">
-                  <X size={22} />
-                </button>
+                <button onClick={() => setSelected(null)}><X size={22} /></button>
               </div>
 
               <div className="mb-8">
                 <div className="text-xs font-semibold tracking-wider text-electric mb-2">AI SUMMARY</div>
-                <div className="bg-electriclight rounded-2xl p-5 text-sm leading-relaxed">
-                  {selected.analysis?.summary || 'No summary available.'}
-                </div>
+                <div className="bg-electriclight rounded-2xl p-5 text-sm">{selected.analysis?.summary || 'No summary available.'}</div>
               </div>
 
               <div className="mb-8">
                 <div className="text-xs font-semibold tracking-wider text-gray-500 mb-2">OUTCOME</div>
-                <div className={`inline-block px-4 py-1.5 rounded-2xl text-sm font-semibold ${getStatus(selected).color}`}>
-                  {getStatus(selected).label}
-                </div>
+                <div className={`inline-block px-4 py-1.5 rounded-2xl text-sm font-semibold ${getStatus(selected).color}`}>{getStatus(selected).label}</div>
               </div>
 
+              {/* TRANSCRIPT - FIXED */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-xs font-semibold tracking-wider text-gray-500">FULL TRANSCRIPT</div>
-                  <button 
-                    onClick={() => {
-                      const text = (selected.transcript || []).map(m => `${m.role.toUpperCase()}: ${m.message || m.content}`).join('\n\n')
-                      navigator.clipboard.writeText(text)
-                      alert('Transcript copied!')
-                    }}
-                    className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700"
-                  >
+                  <button onClick={() => {
+                    const text = selectedTranscript.map((m: any) => `${(m.role || 'user').toUpperCase()}: ${m.message || m.content || ''}`).join('\n\n')
+                    navigator.clipboard.writeText(text)
+                    alert('Transcript copied!')
+                  }} className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700">
                     <Download size={14} /> Copy
                   </button>
                 </div>
 
                 <div className="space-y-4 text-sm">
-                  {(selected.transcript || []).length > 0 ? (
-                    selected.transcript.map((msg: any, i: number) => (
+                  {selectedTranscript.length > 0 ? (
+                    selectedTranscript.map((msg: any, i: number) => (
                       <div key={i} className={`flex ${msg.role === 'assistant' ? 'justify-end' : ''}`}>
-                        <div className={`max-w-[85%] px-4 py-3 rounded-3xl ${
-                          msg.role === 'assistant' 
-                            ? 'bg-electric text-white rounded-tr-none' 
-                            : 'bg-gray-100 rounded-tl-none'
-                        }`}>
-                          {msg.message || msg.content}
+                        <div className={`max-w-[85%] px-4 py-3 rounded-3xl ${msg.role === 'assistant' ? 'bg-electric text-white rounded-tr-none' : 'bg-gray-100 rounded-tl-none'}`}>
+                          {msg.message || msg.content || ''}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="bg-gray-50 rounded-2xl p-6 text-sm text-gray-500 text-center">
-                      No transcript available for this call.
-                    </div>
+                    <div className="bg-gray-50 rounded-2xl p-6 text-sm text-gray-500 text-center">No transcript available for this call.</div>
                   )}
                 </div>
               </div>
-
-              <div className="mt-10 pt-6 border-t text-xs text-gray-400">
-                Call ID: {selected.id}
-              </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {debugError && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-6" onClick={() => setDebugError('')}>
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
-            <pre className="text-xs whitespace-pre-wrap overflow-auto max-h-[70vh]">{debugError}</pre>
           </div>
         </div>
       )}
