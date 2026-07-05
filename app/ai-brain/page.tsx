@@ -43,12 +43,7 @@ export default function AIBrainPage() {
       if (!user) return
       setUserId(user.id)
 
-      const { data } = await supabase
-        .from('ai_brain')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle()
-
+      const { data } = await supabase.from('ai_brain').select('*').eq('user_id', user.id).maybeSingle()
       if (data) {
         setForm({
           practice_name: data.practice_name || '',
@@ -326,7 +321,7 @@ Your tone should be ${form.ai_tone.replace('_', ' ')}. Always be professional, h
           <p className="text-xs text-gray-500 mt-2">If any of these are mentioned, the call is immediately forwarded to the emergency number.</p>
         </div>
 
-        {/* Tone & Settings */}
+        {/* Tone */}
         <div className="card p-7 mb-8">
           <h2 className="font-semibold text-lg mb-4">AI Tone</h2>
           <div className="flex gap-3 flex-wrap">
