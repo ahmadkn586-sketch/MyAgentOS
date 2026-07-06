@@ -31,11 +31,9 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  // Demo login helper
   const loginAsDemo = () => {
     setEmail('demo@agentos.app')
     setPassword('demo123')
-    // In a real app you'd sign in, here we just redirect
     setTimeout(() => router.push('/dashboard'), 800)
   }
 
